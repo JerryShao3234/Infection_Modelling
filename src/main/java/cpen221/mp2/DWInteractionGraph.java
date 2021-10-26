@@ -1,12 +1,20 @@
 package cpen221.mp2;
 
+import java.io.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 public class DWInteractionGraph {
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
+
+    private String fileName = new String();
+    private StringBuilder interaction = new StringBuilder();
+    private Set<Integer> adjacencyMatrix[][];
+    private HashSet<String> vertexSet = new HashSet<>();
 
     /**
      * Creates a new DWInteractionGraph using an email interaction file.
@@ -16,7 +24,123 @@ public class DWInteractionGraph {
      *                 directory containing email interactions
      */
     public DWInteractionGraph(String fileName) {
-        // TODO: Implement this constructor
+        this.fileName = fileName;
+        File text = new File(fileName);
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                interaction.append(" ");
+                interaction.append(fileLine);
+            }
+            reader.close();
+        }
+        catch (FileNotFoundException oof){
+            System.out.println("Constructor failed!");
+        }
+        catch (IOException ioe){
+            System.out.println("IOE exception!");
+        }
+
+        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+        for(int i=0; i<interaction.toString().trim().split(" ").length; i++){
+            if((i)%3 != 0){
+                vertexSet.add(interaction.toString().split(" ")[i]);
+            }
+        }
+
+        int max = 0;
+        for(String user : vertexSet){
+            if(Integer.parseInt(user) > max){
+                max = Integer.parseInt(user);
+            }
+        }
+
+        //adjacencyMatrix = new int[max+1][max+1];
+        adjacencyMatrix = new Set[max+1][max+1];
+
+
+        for(int i=0; i<adjacencyMatrix.length; i++){
+            for(int j=0; j<adjacencyMatrix.length; j++){
+                //adjacencyMatrix[i][j] = -1;
+                adjacencyMatrix[i][j] = new HashSet<>();
+            }
+        }
+
+        for(int i=0; i<charArr.length; i+=3){
+            //adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])] = Integer.parseInt(charArr[i+2]);
+            adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])].add(Integer.parseInt(charArr[i+2]));
+        }
+
+
+        System.out.println("hi");
+
+    }
+
+    /**
+     * Creates a new DWInteractionGraph using an email interaction file.
+     * The email interaction file will be in the resources directory.
+     *
+     * @param fileName the name of the file in the resources
+     *                 directory containing email interactions
+     * @param timeWindow the 2 element array that specifies the timeWindow of
+     *                 email interactions supposed to be recorded
+     */
+    public DWInteractionGraph(String fileName, int[] timeWindow) {
+        this.fileName = fileName;
+        File text = new File(fileName);
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                interaction.append(" ");
+                interaction.append(fileLine);
+            }
+            reader.close();
+        }
+        catch (FileNotFoundException oof){
+            System.out.println("Constructor failed!");
+        }
+        catch (IOException ioe){
+            System.out.println("IOE exception!");
+        }
+
+        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+        for(int i=0; i<interaction.toString().trim().split(" ").length; i+=3){
+            if(Integer.parseInt((charArr[i+2])) <= timeWindow[1] && Integer.parseInt((charArr[i+2])) >= timeWindow[0]){
+                vertexSet.add(charArr[i]);
+                vertexSet.add(charArr[i+1]);
+            }
+        }
+
+        int max = 0;
+        for(String user : vertexSet){
+            if(Integer.parseInt(user) > max){
+                max = Integer.parseInt(user);
+            }
+        }
+
+        //adjacencyMatrix = new int[max+1][max+1];
+        adjacencyMatrix = new Set[max+1][max+1];
+
+        for(int i=0; i<max+1; i++){
+            for(int j=0; j<max+1; j++){
+                adjacencyMatrix[i][j] = new HashSet<>();
+            }
+        }
+        for(int i=0; i<charArr.length; i+=3){
+            if(Integer.parseInt(charArr[i+2]) <= timeWindow[1] && Integer.parseInt(charArr[i+2]) >= timeWindow[0]){
+                adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])].add(Integer.parseInt(charArr[i+2]));
+            }
+            else{
+                if(i < max+1 && i+1 < max+1) {
+                    adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt("-1"));
+                }
+                else{
+                    continue;
+                }
+            }
+        }
+        System.out.println("hi");
+
     }
 
     /**
@@ -31,7 +155,34 @@ public class DWInteractionGraph {
      *                   t0 <= t <= t1 range.
      */
     public DWInteractionGraph(DWInteractionGraph inputDWIG, int[] timeFilter) {
-        // TODO: Implement this constructor
+
+        fileName = inputDWIG.helperGetFileName();
+        int tempSize = inputDWIG.helperGetAdjMatx().length;
+        //int[][] temp = new int[tempSize][tempSize];
+        Set<Integer> temp[][] = new Set[tempSize][tempSize];
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
+                temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //NEED TO MAKE A COPY
+            }
+        }
+
+        this.adjacencyMatrix = temp; //risky move
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                /*if(temp[i][j] >= timeFilter[0] && temp[i][j] <= timeFilter[1]){
+                    vertexSet.add(String.valueOf(i));
+                    vertexSet.add(String.valueOf(j));
+                }*/
+
+                for(Integer inty : temp[i][j]){
+                    if(inty >= timeFilter[0] && inty <= timeFilter[1]){
+                        vertexSet.add(String.valueOf(i));
+                        vertexSet.add(String.valueOf(j));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -45,7 +196,31 @@ public class DWInteractionGraph {
      *                   nor the receiver exist in userFilter.
      */
     public DWInteractionGraph(DWInteractionGraph inputDWIG, List<Integer> userFilter) {
-        // TODO: Implement this constructor
+        fileName = inputDWIG.helperGetFileName();
+        int tempSize = inputDWIG.helperGetAdjMatx().length;
+        //int[][] temp = new int[tempSize][tempSize];
+        Set<Integer> temp[][] = new Set[tempSize][tempSize];
+        for(int i=0; i<tempSize; i++){
+            for(int j=0; j<tempSize; j++){
+                if(userFilter.contains(i) || userFilter.contains(j)) {
+                    temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
+                }
+                else{
+                    temp[i][j] = new HashSet<>();
+                }
+            }
+        }
+        adjacencyMatrix = temp;
+        System.out.println("lmao");
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                if(!temp[i][j].isEmpty()){
+                    vertexSet.add(String.valueOf(i));
+                    vertexSet.add(String.valueOf(j));
+                }
+            }
+        }
+
     }
 
     /**
@@ -53,8 +228,13 @@ public class DWInteractionGraph {
      * in this DWInteractionGraph.
      */
     public Set<Integer> getUserIDs() {
-        // TODO: Implement this getter method
-        return null;
+        Set<Integer> UserIDs = new HashSet<>();
+        for(String id : vertexSet){
+            Integer num = (Integer.parseInt(id));
+            UserIDs.add(num);
+            num = null;
+        }
+        return UserIDs;
     }
 
     /**
@@ -64,8 +244,30 @@ public class DWInteractionGraph {
      * receiver in this DWInteractionGraph.
      */
     public int getEmailCount(int sender, int receiver) {
-        // TODO: Implement this getter method
-        return 0;
+        return adjacencyMatrix[sender][receiver].size();
+    }
+
+    /*
+     *Helper method
+     */
+    String helperGetFileName() {
+        return fileName;
+    }
+
+    /*int[][] helperGetAdjMatx() {*/
+    Set<Integer>[][] helperGetAdjMatx(){
+        Set<Integer> temp[][] = new Set[adjacencyMatrix.length][adjacencyMatrix.length];
+        for(int i=0; i<adjacencyMatrix.length; i++){
+            for(int j=0; j<adjacencyMatrix.length; j++){
+                temp[i][j] = new HashSet<>();
+                temp[i][j].addAll(adjacencyMatrix[i][j]);
+            }
+        }
+        return adjacencyMatrix;
+    }
+
+    Set<String> getFileName() {
+        return vertexSet;
     }
 
     /* ------- Task 2 ------- */

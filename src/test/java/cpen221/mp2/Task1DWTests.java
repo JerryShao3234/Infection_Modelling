@@ -58,4 +58,10 @@ public class Task1DWTests {
         Assertions.assertEquals(2, dwig2.getEmailCount(2, 3));
     }
 
+    @Test
+    public void custom() {
+        DWInteractionGraph dwigC = new DWInteractionGraph("resources/Task1-2Transactions.txt", new int[]{2,3});
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3)), dwigC.getUserIDs());
+    }
+
 }

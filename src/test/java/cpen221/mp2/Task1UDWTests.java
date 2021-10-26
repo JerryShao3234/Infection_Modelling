@@ -73,4 +73,13 @@ public class Task1UDWTests {
         Assertions.assertEquals(2, udwig.getEmailCount(2, 3));
     }
 
+    @Test
+    public void testConstructionFromDW1WithTimeWindow() { //made by Jerry
+        int arr[] = {9,10};
+        DWInteractionGraph dwig = new DWInteractionGraph("resources/Task1-2UDWTransactions.txt", arr);
+        UDWInteractionGraph udwig = new UDWInteractionGraph(dwig);
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 8)), udwig.getUserIDs());
+        Assertions.assertEquals(2, udwig.getEmailCount(2, 3));
+    }
+
 }
