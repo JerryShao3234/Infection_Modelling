@@ -1,9 +1,17 @@
 package cpen221.mp2;
 
+import java.io.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 public class UDWInteractionGraph {
+
+    private String fileName = new String();
+    private StringBuilder interaction = new StringBuilder();
+    private Set<Integer> adjacencyMatrix[][];
+    private HashSet<String> vertexSet = new HashSet<>();
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
@@ -16,7 +24,52 @@ public class UDWInteractionGraph {
      *                 directory containing email interactions
      */
     public UDWInteractionGraph(String fileName) {
-        // TODO: Implement this constructor
+        this.fileName = fileName;
+        File text = new File(fileName);
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                interaction.append(" ");
+                interaction.append(fileLine);
+            }
+            reader.close();
+        }
+        catch (FileNotFoundException oof){
+            System.out.println("Constructor failed!");
+        }
+        catch (IOException ioe){
+            System.out.println("IOE exception!");
+        }
+
+        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+        for(int i=0; i<charArr.length; i++){
+            if((i+1)%3 != 0){
+                vertexSet.add(charArr[i]);
+            }
+        }
+
+        int max = 0;
+        for(String user : vertexSet){
+            if(Integer.parseInt(user) > max){
+                max = Integer.parseInt(user);
+            }
+        }
+
+        adjacencyMatrix = new Set[max+1][max+1];
+
+
+        for(int i=0; i<adjacencyMatrix.length; i++){
+            for(int j=0; j<adjacencyMatrix.length; j++){
+                adjacencyMatrix[i][j] = new HashSet<>();
+            }
+        }
+
+        for(int i=0; i<charArr.length; i+=3){
+            adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])].add(Integer.parseInt(charArr[i+2]));
+        }
+
+
+        System.out.println("hi");
     }
 
     /**
@@ -31,7 +84,41 @@ public class UDWInteractionGraph {
      *                   t0 <= t <= t1 range.
      */
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, int[] timeFilter) {
-        // TODO: Implement this constructor
+
+        fileName = inputUDWIG.helperGetFileName();
+        int tempSize = inputUDWIG.helperGetAdjMatx().length;
+        //int[][] temp = new int[tempSize][tempSize];
+        Set<Integer> temp[][] = new Set[tempSize][tempSize]; //modify
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
+                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //NEED TO MAKE A COPY
+
+                temp[i][j] = new HashSet<>();
+                for(Integer time : inputUDWIG.helperGetAdjMatx()[i][j]){
+                    if(time >= timeFilter[0] && time <= timeFilter[1]){
+                        temp[i][j].add(time);
+                    }
+                }
+            }
+        }
+
+        this.adjacencyMatrix = temp; //risky move
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                /*if(temp[i][j] >= timeFilter[0] && temp[i][j] <= timeFilter[1]){
+                    vertexSet.add(String.valueOf(i));
+                    vertexSet.add(String.valueOf(j));
+                }*/
+
+                for(Integer inty : temp[i][j]){
+                    if(inty >= timeFilter[0] && inty <= timeFilter[1]){ //guaranteed anyways
+                        vertexSet.add(String.valueOf(i));
+                        vertexSet.add(String.valueOf(j));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -45,7 +132,30 @@ public class UDWInteractionGraph {
      *                   nor the receiver exist in userFilter.
      */
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, List<Integer> userFilter) {
-        // TODO: Implement this constructor
+        fileName = inputUDWIG.helperGetFileName();
+        int tempSize = inputUDWIG.helperGetAdjMatx().length;
+        //int[][] temp = new int[tempSize][tempSize];
+        Set<Integer> temp[][] = new Set[tempSize][tempSize];
+        for(int i=0; i<tempSize; i++){
+            for(int j=0; j<tempSize; j++){
+                if(userFilter.contains(i) || userFilter.contains(j)) {
+                    temp[i][j] = inputUDWIG.helperGetAdjMatx()[i][j];
+                }
+                else{
+                    temp[i][j] = new HashSet<>();
+                }
+            }
+        }
+        adjacencyMatrix = temp;
+        System.out.println("lmao");
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                if(!temp[i][j].isEmpty()){
+                    vertexSet.add(String.valueOf(i));
+                    vertexSet.add(String.valueOf(j));
+                }
+            }
+        }
     }
 
     /**
@@ -54,7 +164,26 @@ public class UDWInteractionGraph {
      * @param inputDWIG a DWInteractionGraph object
      */
     public UDWInteractionGraph(DWInteractionGraph inputDWIG) {
-        // TODO: Implement this constructor
+        fileName = inputDWIG.helperGetFileName();
+        int tempSize = inputDWIG.helperGetAdjMatx().length;
+        //int[][] temp = new int[tempSize][tempSize];
+        Set<Integer> temp[][] = new Set[tempSize][tempSize];
+        for(int i=0; i<tempSize; i++){
+            for(int j=0; j<tempSize; j++){
+                    temp[i][j] = new HashSet<>();
+                    temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j];
+            }
+        }
+        adjacencyMatrix = temp;
+        System.out.println("lmao");
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                if(!temp[i][j].isEmpty()){
+                    vertexSet.add(String.valueOf(i));
+                    vertexSet.add(String.valueOf(j));
+                }
+            }
+        }
     }
 
     /**
@@ -62,8 +191,13 @@ public class UDWInteractionGraph {
      * in this UDWInteractionGraph.
      */
     public Set<Integer> getUserIDs() {
-        // TODO: Implement this getter method
-        return null;
+        Set<Integer> UserIDs = new HashSet<>();
+        for(String id : vertexSet){
+            Integer num = (Integer.parseInt(id));
+            UserIDs.add(num);
+            num = null;
+        }
+        return UserIDs;
     }
 
     /**
@@ -72,8 +206,30 @@ public class UDWInteractionGraph {
      * @return the number of email interactions (send/receive) between user1 and user2
      */
     public int getEmailCount(int user1, int user2) {
-        // TODO: Implement this getter method
-        return 0;
+        return adjacencyMatrix[user1][user2].size()+adjacencyMatrix[user2][user1].size();
+    }
+
+    /*
+     *Helper method
+     */
+    String helperGetFileName() {
+        return fileName;
+    }
+
+    /*int[][] helperGetAdjMatx() {*/
+    Set<Integer>[][] helperGetAdjMatx(){
+        Set<Integer> temp[][] = new Set[adjacencyMatrix.length][adjacencyMatrix.length];
+        for(int i=0; i<adjacencyMatrix.length; i++){
+            for(int j=0; j<adjacencyMatrix.length; j++){
+                temp[i][j] = new HashSet<>();
+                temp[i][j].addAll(adjacencyMatrix[i][j]);
+            }
+        }
+        return adjacencyMatrix; //copy????
+    }
+
+    Set<String> getVertexSet() {
+        return vertexSet; //make a copy
     }
 
     /* ------- Task 2 ------- */
