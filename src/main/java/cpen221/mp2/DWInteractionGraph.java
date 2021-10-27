@@ -42,9 +42,9 @@ public class DWInteractionGraph {
         }
 
         String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
-        for(int i=0; i<interaction.toString().trim().split(" ").length; i++){
-            if((i)%3 != 0){
-                vertexSet.add(interaction.toString().split(" ")[i]);
+        for(int i=0; i<charArr.length; i++){
+            if((i+1)%3 != 0){
+                vertexSet.add(charArr[i]);
             }
         }
 
