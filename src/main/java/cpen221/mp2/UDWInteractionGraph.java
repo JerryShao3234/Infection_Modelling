@@ -1,10 +1,7 @@
 package cpen221.mp2;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class UDWInteractionGraph {
 
@@ -170,8 +167,8 @@ public class UDWInteractionGraph {
         Set<Integer> temp[][] = new Set[tempSize][tempSize];
         for(int i=0; i<tempSize; i++){
             for(int j=0; j<tempSize; j++){
-                    temp[i][j] = new HashSet<>();
-                    temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j];
+                temp[i][j] = new HashSet<>();
+                temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j];
             }
         }
         adjacencyMatrix = temp;
@@ -242,7 +239,27 @@ public class UDWInteractionGraph {
      */
     public int[] ReportActivityInTimeWindow(int[] timeWindow) {
         // TODO: Implement this method
-        return null;
+
+        UDWInteractionGraph time = new UDWInteractionGraph(this,timeWindow );
+        int[] activity = new int[2];
+
+        Set<Integer> user = time.getUserIDs();
+        List<Integer> userList = user.stream().toList();
+        activity[0] = user.size();
+        activity[1] = 0;
+
+        for(int i = 0; i<user.size(); i++)
+        {
+            for(int j = i+1; j< user.size(); j++)
+            {
+                activity[1]+= time.getEmailCount(i,userList.get(j));
+
+            }
+
+
+        }
+
+        return activity;
     }
 
     /**
@@ -255,7 +272,42 @@ public class UDWInteractionGraph {
      */
     public int[] ReportOnUser(int userID) {
         // TODO: Implement this method
-        return null;
+
+        Set<Integer> userSet = this.getUserIDs();
+        List<Integer> userList = userSet.stream().toList();
+        int[] report = new int[]{0,0};
+        boolean check = true;
+        int k = 0;
+
+        for(int j: userList)
+        {
+            if(userID == j)
+            {
+                k = j;
+                check = false;
+            }
+
+        }
+
+        if(check)
+        {
+            return report;
+
+        }
+
+        for(int i = 0; i < userList.size(); i++)
+        {
+            report[0]  += this.getEmailCount(k,userList.get(i));
+
+            if(this.getEmailCount(k,i) > 0)
+            {
+                report[1]++;
+            }
+
+
+        }
+
+        return report;
     }
 
     /**
@@ -263,8 +315,55 @@ public class UDWInteractionGraph {
      * @return the User ID for the Nth most active user
      */
     public int NthMostActiveUser(int N) {
-        // TODO: Implement this method
-        return -1;
+        int arr[] = new int[adjacencyMatrix.length];
+        int arr3[] = new int[adjacencyMatrix.length];
+        int sum = 0; //dont forget to reset it!
+        for(int i=0; i<adjacencyMatrix.length; i++){
+            for(int j=0; j< adjacencyMatrix[0].length; j++){
+                 sum += adjacencyMatrix[i][j].size();
+                 sum += adjacencyMatrix[j][i].size();
+            }
+            arr[i] = sum;
+            sum = 0;
+        }
+
+        HashMap<Integer, Integer> sorter = new HashMap<>();
+        for(int i=0; i<arr.length; i++){
+            sorter.put(i,arr[i]);
+        }
+
+        int test = 0;
+        for(Integer i : sorter.keySet()){
+            if(sorter.get(i)>0){test++;}
+        }
+        if(N>test){
+            return -1;
+        }
+
+        int best = -1;
+        int bestInd = 0;
+        int index = 0;
+        while(!sorter.isEmpty()){
+            for(Integer i : sorter.keySet()){
+                if(sorter.get(i) > best){
+                    bestInd = i;
+                    best = sorter.get(i);
+                }
+                else if(sorter.get(i) - bestInd == 0){
+                    if(i < bestInd){
+                        bestInd = i;
+                        best = sorter.get(i);
+                    }
+                }
+            }
+            arr3[index] = bestInd;
+            index++;
+            sorter.remove(bestInd);
+            best = -1;
+            bestInd = 0;
+        }
+
+        return arr3[N-1];
     }
 
     /* ------- Task 3 ------- */
