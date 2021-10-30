@@ -7,7 +7,7 @@ public class UDWInteractionGraph {
 
     private String fileName = new String();
     private StringBuilder interaction = new StringBuilder();
-    private Set<Integer> adjacencyMatrix[][];
+    private List<Integer> adjacencyMatrix[][];
     private HashSet<String> vertexSet = new HashSet<>();
 
     /* ------- Task 1 ------- */
@@ -52,12 +52,12 @@ public class UDWInteractionGraph {
             }
         }
 
-        adjacencyMatrix = new Set[max+1][max+1];
+        adjacencyMatrix = new ArrayList[max+1][max+1];
 
 
         for(int i=0; i<adjacencyMatrix.length; i++){
             for(int j=0; j<adjacencyMatrix.length; j++){
-                adjacencyMatrix[i][j] = new HashSet<>();
+                adjacencyMatrix[i][j] = new ArrayList<>();
             }
         }
 
@@ -85,13 +85,13 @@ public class UDWInteractionGraph {
         fileName = inputUDWIG.helperGetFileName();
         int tempSize = inputUDWIG.helperGetAdjMatx().length;
         //int[][] temp = new int[tempSize][tempSize];
-        Set<Integer> temp[][] = new Set[tempSize][tempSize]; //modify
+        List<Integer> temp[][] = new ArrayList[tempSize][tempSize]; //modify
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
                 //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
                 //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //NEED TO MAKE A COPY
 
-                temp[i][j] = new HashSet<>();
+                temp[i][j] = new ArrayList<>();
                 for(Integer time : inputUDWIG.helperGetAdjMatx()[i][j]){
                     if(time >= timeFilter[0] && time <= timeFilter[1]){
                         temp[i][j].add(time);
@@ -132,14 +132,14 @@ public class UDWInteractionGraph {
         fileName = inputUDWIG.helperGetFileName();
         int tempSize = inputUDWIG.helperGetAdjMatx().length;
         //int[][] temp = new int[tempSize][tempSize];
-        Set<Integer> temp[][] = new Set[tempSize][tempSize];
+        List<Integer> temp[][] = new ArrayList[tempSize][tempSize];
         for(int i=0; i<tempSize; i++){
             for(int j=0; j<tempSize; j++){
                 if(userFilter.contains(i) || userFilter.contains(j)) {
                     temp[i][j] = inputUDWIG.helperGetAdjMatx()[i][j];
                 }
                 else{
-                    temp[i][j] = new HashSet<>();
+                    temp[i][j] = new ArrayList();
                 }
             }
         }
@@ -164,10 +164,10 @@ public class UDWInteractionGraph {
         fileName = inputDWIG.helperGetFileName();
         int tempSize = inputDWIG.helperGetAdjMatx().length;
         //int[][] temp = new int[tempSize][tempSize];
-        Set<Integer> temp[][] = new Set[tempSize][tempSize];
+        List<Integer> temp[][] = new ArrayList[tempSize][tempSize];
         for(int i=0; i<tempSize; i++){
             for(int j=0; j<tempSize; j++){
-                temp[i][j] = new HashSet<>();
+                temp[i][j] = new ArrayList<>();
                 temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j];
             }
         }
@@ -214,11 +214,11 @@ public class UDWInteractionGraph {
     }
 
     /*int[][] helperGetAdjMatx() {*/
-    Set<Integer>[][] helperGetAdjMatx(){
-        Set<Integer> temp[][] = new Set[adjacencyMatrix.length][adjacencyMatrix.length];
+    List<Integer>[][] helperGetAdjMatx(){
+        List<Integer> temp[][] = new ArrayList[adjacencyMatrix.length][adjacencyMatrix.length];
         for(int i=0; i<adjacencyMatrix.length; i++){
             for(int j=0; j<adjacencyMatrix.length; j++){
-                temp[i][j] = new HashSet<>();
+                temp[i][j] = new ArrayList();
                 temp[i][j].addAll(adjacencyMatrix[i][j]);
             }
         }

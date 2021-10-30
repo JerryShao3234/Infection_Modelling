@@ -1,6 +1,7 @@
 package cpen221.mp2;
 
 import java.io.*;
+import java.sql.Array;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -11,7 +12,7 @@ public class DWInteractionGraph {
 
     private String fileName = new String();
     private StringBuilder interaction = new StringBuilder();
-    private Set<Integer> adjacencyMatrix[][];
+    private List<Integer> adjacencyMatrix[][];
     private HashSet<String> vertexSet = new HashSet<>();
 
     /**
@@ -54,13 +55,13 @@ public class DWInteractionGraph {
         }
 
         //adjacencyMatrix = new int[max+1][max+1];
-        adjacencyMatrix = new Set[max+1][max+1];
+        adjacencyMatrix = new ArrayList[max+1][max+1];
 
 
         for(int i=0; i<adjacencyMatrix.length; i++){
             for(int j=0; j<adjacencyMatrix.length; j++){
                 //adjacencyMatrix[i][j] = -1;
-                adjacencyMatrix[i][j] = new HashSet<>();
+                adjacencyMatrix[i][j] = new ArrayList<>();
             }
         }
 
@@ -117,11 +118,11 @@ public class DWInteractionGraph {
         }
 
         //adjacencyMatrix = new int[max+1][max+1];
-        adjacencyMatrix = new Set[max+1][max+1];
+        adjacencyMatrix = new ArrayList[max+1][max+1];
 
         for(int i=0; i<max+1; i++){
             for(int j=0; j<max+1; j++){
-                adjacencyMatrix[i][j] = new HashSet<>();
+                adjacencyMatrix[i][j] = new ArrayList<>();
             }
         }
         for(int i=0; i<charArr.length; i+=3){
@@ -157,13 +158,13 @@ public class DWInteractionGraph {
         fileName = inputDWIG.helperGetFileName();
         int tempSize = inputDWIG.helperGetAdjMatx().length;
         //int[][] temp = new int[tempSize][tempSize];
-        Set<Integer> temp[][] = new Set[tempSize][tempSize]; //modify
+        List<Integer> temp[][] = new ArrayList[tempSize][tempSize]; //modify
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
                 //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
                 //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //NEED TO MAKE A COPY
 
-                temp[i][j] = new HashSet<>();
+                temp[i][j] = new ArrayList<>();
                 for(Integer time : inputDWIG.helperGetAdjMatx()[i][j]){
                     if(time >= timeFilter[0] && time <= timeFilter[1]){
                         temp[i][j].add(time);
@@ -204,14 +205,14 @@ public class DWInteractionGraph {
         fileName = inputDWIG.helperGetFileName();
         int tempSize = inputDWIG.helperGetAdjMatx().length;
         //int[][] temp = new int[tempSize][tempSize];
-        Set<Integer> temp[][] = new Set[tempSize][tempSize];
+        List<Integer> temp[][] = new ArrayList[tempSize][tempSize];
         for(int i=0; i<tempSize; i++){
             for(int j=0; j<tempSize; j++){
                 if(userFilter.contains(i) || userFilter.contains(j)) {
                     temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j];
                 }
                 else{
-                    temp[i][j] = new HashSet<>();
+                    temp[i][j] = new ArrayList<>();
                 }
             }
         }
@@ -260,11 +261,11 @@ public class DWInteractionGraph {
     }
 
     /*int[][] helperGetAdjMatx() {*/
-    Set<Integer>[][] helperGetAdjMatx(){
-        Set<Integer> temp[][] = new Set[adjacencyMatrix.length][adjacencyMatrix.length];
+    List<Integer>[][] helperGetAdjMatx(){
+        List<Integer> temp[][] = new ArrayList[adjacencyMatrix.length][adjacencyMatrix.length];
         for(int i=0; i<adjacencyMatrix.length; i++){
             for(int j=0; j<adjacencyMatrix.length; j++){
-                temp[i][j] = new HashSet<>();
+                temp[i][j] = new ArrayList<>();
                 temp[i][j].addAll(adjacencyMatrix[i][j]);
             }
         }
