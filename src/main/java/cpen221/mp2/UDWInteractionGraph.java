@@ -203,7 +203,7 @@ public class UDWInteractionGraph {
      * @return the number of email interactions (send/receive) between user1 and user2
      */
     public int getEmailCount(int user1, int user2) {
-        return adjacencyMatrix[user1][user2].size()+adjacencyMatrix[user2][user1].size();
+        return user1==user2 ? adjacencyMatrix[user1][user2].size() : adjacencyMatrix[user1][user2].size()+adjacencyMatrix[user2][user1].size();
     }
 
     /*
@@ -368,13 +368,48 @@ public class UDWInteractionGraph {
 
     /* ------- Task 3 ------- */
 
+    private Set<Integer> getNeighbors(int node) {
+        Set<Integer> users = new HashSet<>();
+
+        for (int j = 0; j < adjacencyMatrix.length; j++) {
+            if ( !adjacencyMatrix[node][j].isEmpty()) {
+                users.add(j);
+            }
+        }
+        for (int j = 0; j < adjacencyMatrix.length; j++) {
+            if ( !adjacencyMatrix[j][node].isEmpty()) {
+                users.add(j);
+            }
+        }
+
+
+        return users;
+    }
+
     /**
      * @return the number of completely disjoint graph
      *    components in the UDWInteractionGraph object.
      */
     public int NumberOfComponents() {
-        // TODO: Implement this method
-        return 0;
+        int count =0 ;
+        Set<Integer> visited = new HashSet<>();
+        for(String node : getVertexSet()){
+            int node2 = Integer.parseInt(node);
+            if(!visited.contains(node2)){
+                DFSRecur(node2, visited);
+                count ++;
+            }
+        }
+        return count;
+    }
+
+    void DFSRecur(int v, Set<Integer> visited){ //this works
+        visited.add(v);
+        for(Integer i : getNeighbors(v)){
+            if(!visited.contains(i)){
+                DFSRecur(i, visited);
+            }
+        }
     }
 
     /**
@@ -383,8 +418,36 @@ public class UDWInteractionGraph {
      * @return whether a path exists between the two users
      */
     public boolean PathExists(int userID1, int userID2) {
-        // TODO: Implement this method
+        Set<Integer> visited = new HashSet<>(); //IMPROVE PERFORMANCE
+        Queue<Integer> queue = new LinkedList<>();
+        List<Integer> order = new ArrayList<>();
+
+        visited.add(userID1);
+        queue.add(userID1);
+        order.add(userID1);
+        while(!queue.isEmpty()){
+            Integer node = queue.poll();
+            Set<Integer> neighbours = getNeighbors(node);
+
+            for(Integer n : neighbours){ //preserves ascending order
+                if(n == userID2){
+                    order.add(userID2);
+                    return true;
+                }
+
+                if(!visited.contains(n)){
+                    visited.add(n);
+                    queue.add(n);
+                    order.add(n);
+                }
+            }
+
+        }
+
+
+
         return false;
+
     }
 
 }

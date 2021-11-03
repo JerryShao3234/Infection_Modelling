@@ -72,7 +72,7 @@ public class DWInteractionGraph {
         }
 
 
-        System.out.println("hi");
+
 
     }
 
