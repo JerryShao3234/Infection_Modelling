@@ -483,6 +483,18 @@ public class DWInteractionGraph {
         return users;
     }
 
+    private List<Integer> getNeighbors2(int node) {
+        List<Integer> users = new ArrayList<>();
+
+        for (int j = adjacencyMatrix.length-1; j > 0; j--) {
+            if ( !adjacencyMatrix[node][j].isEmpty()) {
+                users.add(j);
+            }
+        }
+
+        return users;
+    }
+
     /**
      * performs breadth first search on the DWInteractionGraph object
      * to check path between user with userID1 and user with userID2.
@@ -562,8 +574,28 @@ public class DWInteractionGraph {
      * if no path exists, should return null.
      */
     public List<Integer> DFS(int userID1, int userID2) {
-        // TODO: Implement this method
-        return null;
+        List<Integer> order = new ArrayList<>();
+        Stack<Integer> stack = new Stack<>();
+        Set<Integer> visited = new HashSet<>();
+        stack.push(userID1);
+
+        while(!stack.isEmpty()){
+            int node = stack.pop();
+            if(node == userID2){
+                order.add(userID2);
+                return order;
+            }
+            if(!visited.contains(node)){
+                visited.add(node);
+                order.add(node);
+                for(Integer neighbour : getNeighbors2(node)){ //getNeighbors2 gets neighbours in reverse order
+                    stack.push(neighbour);
+                }
+            }
+        }
+
+        return order;
+
     }
 
     /* ------- Task 4 ------- */
