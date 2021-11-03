@@ -4,6 +4,7 @@ import java.io.*;
 import java.sql.Array;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DWInteractionGraph {
 
@@ -273,6 +274,8 @@ public class DWInteractionGraph {
     }
 
     Set<String> getVertexSet() {
+
+
         return vertexSet; //make a copy
     }
 
@@ -468,9 +471,22 @@ public class DWInteractionGraph {
 
     /* ------- Task 3 ------- */
 
+    private List<Integer> getNeighbors(int node) {
+        List<Integer> users = new ArrayList<>();
+
+            for (int j = 0; j < adjacencyMatrix.length; j++) {
+                if ( !adjacencyMatrix[node][j].isEmpty()) {
+                    users.add(j);
+                }
+            }
+
+        return users;
+    }
+
     /**
      * performs breadth first search on the DWInteractionGraph object
      * to check path between user with userID1 and user with userID2.
+     *
      * @param userID1 the user ID for the first user
      * @param userID2 the user ID for the second user
      * @return if a path exists, returns aa list of user IDs
@@ -478,8 +494,62 @@ public class DWInteractionGraph {
      * if no path exists, should return null.
      */
     public List<Integer> BFS(int userID1, int userID2) {
-        // TODO: Implement this method
+       /* Queue<List<Integer>> queue = new LinkedList<>();
+        List<Integer> path = new ArrayList<>();
+        Set<Integer> visited = new HashSet<>();
+        path.add(userID1);
+        queue.add(path);
+
+        while(!queue.isEmpty()){
+            path = queue.poll();
+            int prev = path.get(path.size()-1);
+
+            if(prev == userID2){
+                return path;
+            }
+
+            List<Integer> neighbours = getNeighbors(prev);
+
+            for(int i=0; i<neighbours.size(); i++){
+                if(!path.contains(neighbours.get(i))){
+                    List<Integer> newPath = new ArrayList<>(path);
+                    newPath.add(neighbours.get(i));
+                    queue.add(newPath);
+                }
+            }
+
+        }*/
+
+        Set<Integer> visited = new HashSet<>(); //IMPROVE PERFORMANCE
+        Queue<Integer> queue = new LinkedList<>();
+        List<Integer> order = new ArrayList<>();
+
+        visited.add(userID1);
+        queue.add(userID1);
+        order.add(userID1);
+        while(!queue.isEmpty()){
+            Integer node = queue.poll();
+            List<Integer> neighbours = getNeighbors(node);
+
+            for(Integer n : neighbours){ //preserves ascending order
+                if(n == userID2){
+                    order.add(userID2);
+                    return order;
+                }
+
+                if(!visited.contains(n)){
+                    visited.add(n);
+                    queue.add(n);
+                    order.add(n);
+                }
+            }
+
+        }
+
+
+
         return null;
+
     }
 
     /**

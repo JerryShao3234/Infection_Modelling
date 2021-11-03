@@ -18,6 +18,7 @@ public class Task3DWTests {
         dwig2 = new DWInteractionGraph("resources/Task3Transactions2.txt");
     }
 
+
     @Test
     public void testBFSGraph1() {
         List<Integer> expected = Arrays.asList(1, 2, 3, 4, 6);
