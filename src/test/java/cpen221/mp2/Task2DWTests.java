@@ -5,18 +5,22 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Task2DWTests {
 
     private static DWInteractionGraph dwig;
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
+    private static DWInteractionGraph dwig3;
 
     @BeforeAll
     public static void setupTests() {
         dwig = new DWInteractionGraph("resources/Task1-2Transactions.txt");
         dwig1 = new DWInteractionGraph(dwig, new int[]{3, 9});
         dwig2 = new DWInteractionGraph(dwig, Arrays.asList(2, 3, 4));
+        dwig3 = new DWInteractionGraph("empty.txt");
     }
 
     @Test
@@ -77,5 +81,22 @@ public class Task2DWTests {
     public void testNthMostActiveUserGraph2() {
         Assertions.assertEquals(4, dwig2.NthMostActiveUser(2, SendOrReceive.SEND));
         Assertions.assertEquals(-1, dwig2.NthMostActiveUser(3, SendOrReceive.RECEIVE));
+    }
+
+    @Test
+    public void empty(){
+        Assertions.assertEquals(0, dwig3.getEmailCount(0, 0));
+    }
+
+    @Test
+    public void noUsers(){
+        Set<Integer> expected = new HashSet<>();
+        Assertions.assertEquals(expected, dwig3.getUserIDs());
+    }
+
+    @Test
+    public void emptyTimeFilter(){
+        int[] expected = new int[]{0,0,0};
+        Assertions.assertArrayEquals(expected, dwig3.ReportActivityInTimeWindow(new int[]{1, 100}));
     }
 }

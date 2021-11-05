@@ -13,7 +13,7 @@ public class DWInteractionGraph {
 
     private String fileName = new String();
     private StringBuilder interaction = new StringBuilder();
-    private List<Integer> adjacencyMatrix[][] = new ArrayList[1][1];
+    private List<Integer> adjacencyMatrix[][];
     private HashSet<String> vertexSet = new HashSet<>();
 
     /**
@@ -27,7 +27,7 @@ public class DWInteractionGraph {
         this.fileName = fileName;
         File text = new File(fileName);
 
-        if(text.length()!=0) {
+        if(text.length() != 0) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(fileName));
                 for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
@@ -67,6 +67,7 @@ public class DWInteractionGraph {
             }
 
             for (int i = 0; i < charArr.length; i += 3) {
+                //adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])] = Integer.parseInt(charArr[i+2]);
                 adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt(charArr[i + 2]));
             }
         }
@@ -144,8 +145,15 @@ public class DWInteractionGraph {
                 if (Integer.parseInt(charArr[i + 2]) <= timeWindow[1] && Integer.parseInt(charArr[i + 2]) >= timeWindow[0]) {
                     adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt(charArr[i + 2]));
                 }
+            /*else{
+                if(i < max+1 && i+1 < max+1) { //change
+                    adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt("-1"));
+                }
+                else{
+                    continue;
+                }
+            }*/
             }
-            System.out.println("hi");
         }
         else {
             int max = 0;
@@ -166,7 +174,6 @@ public class DWInteractionGraph {
                 }
             }
         }
-
     }
 
     /**
@@ -184,10 +191,13 @@ public class DWInteractionGraph {
 
         fileName = inputDWIG.helperGetFileName();
         int tempSize = inputDWIG.helperGetAdjMatx().length;
-
+        //int[][] temp = new int[tempSize][tempSize];
         List<Integer> temp[][] = new ArrayList[tempSize][tempSize]; //modify
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
+                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
+                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //NEED TO MAKE A COPY
+
                 temp[i][j] = new ArrayList<>();
                 for(Integer time : inputDWIG.helperGetAdjMatx()[i][j]){
                     if(time >= timeFilter[0] && time <= timeFilter[1]){
@@ -200,6 +210,11 @@ public class DWInteractionGraph {
         this.adjacencyMatrix = temp; //risky move
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
+                /*if(temp[i][j] >= timeFilter[0] && temp[i][j] <= timeFilter[1]){
+                    vertexSet.add(String.valueOf(i));
+                    vertexSet.add(String.valueOf(j));
+                }*/
+
                 for(Integer inty : temp[i][j]){
                     if(inty >= timeFilter[0] && inty <= timeFilter[1]){ //guaranteed anyways
                         vertexSet.add(String.valueOf(i));
@@ -292,6 +307,8 @@ public class DWInteractionGraph {
     }
 
     Set<String> getVertexSet() {
+
+
         return vertexSet; //make a copy
     }
 
@@ -312,7 +329,7 @@ public class DWInteractionGraph {
         int[] activity = new int[]{0,0,0};
 
         Set<Integer> user = time.getUserIDs();
-        List<Integer> userList = user.stream().toList();
+        List<Integer> userList = user.stream().collect(Collectors.toList());
         List<Integer> senderList = new ArrayList<>(0);
         List<Integer> receiverList = new ArrayList<>(0);
 
@@ -375,7 +392,7 @@ public class DWInteractionGraph {
         // TODO: Implement this method
 
         Set<Integer> userSet = this.getUserIDs();
-        List<Integer> userList = userSet.stream().toList();
+        List<Integer> userList = userSet.stream().collect(Collectors.toList());
         int[] report = new int[]{0,0,0};
         boolean check = true;
         int k = 0;
@@ -434,55 +451,55 @@ public class DWInteractionGraph {
      * tie, secondarily sorts the tied User IDs in ascending order.
      */
     public int NthMostActiveUser(int N, SendOrReceive interactionType) {
-            int arr[] = new int[adjacencyMatrix.length];
-            int arr3[] = new int[adjacencyMatrix.length];
-            int sum = 0; //dont forget to reset it!
-            for(int i=0; i<adjacencyMatrix.length; i++){
-                for(int j=0; j< adjacencyMatrix[0].length; j++){
-                    if(interactionType.equals(SendOrReceive.SEND)) {sum += adjacencyMatrix[i][j].size();}
-                    else {sum += adjacencyMatrix[j][i].size();}
-                }
-                arr[i] = sum;
-                sum = 0;
+        int arr[] = new int[adjacencyMatrix.length];
+        int arr3[] = new int[adjacencyMatrix.length];
+        int sum = 0; //dont forget to reset it!
+        for(int i=0; i<adjacencyMatrix.length; i++){
+            for(int j=0; j< adjacencyMatrix[0].length; j++){
+                if(interactionType.equals(SendOrReceive.SEND)) {sum += adjacencyMatrix[i][j].size();}
+                else {sum += adjacencyMatrix[j][i].size();}
             }
+            arr[i] = sum;
+            sum = 0;
+        }
 
-            HashMap<Integer, Integer> sorter = new HashMap<>();
-            for(int i=0; i<arr.length; i++){
-                sorter.put(i,arr[i]);
-            }
+        HashMap<Integer, Integer> sorter = new HashMap<>();
+        for(int i=0; i<arr.length; i++){
+            sorter.put(i,arr[i]);
+        }
 
-            int test = 0;
+        int test = 0;
+        for(Integer i : sorter.keySet()){
+            if(sorter.get(i)>0){test++;}
+        }
+        if(N>test){
+            return -1;
+        }
+
+        int best = -1;
+        int bestInd = 0;
+        int index = 0;
+        while(!sorter.isEmpty()){
             for(Integer i : sorter.keySet()){
-                if(sorter.get(i)>0){test++;}
-            }
-            if(N>test){
-                return -1;
-            }
-
-            int best = -1;
-            int bestInd = 0;
-            int index = 0;
-            while(!sorter.isEmpty()){
-                for(Integer i : sorter.keySet()){
-                    if(sorter.get(i) > best){
+                if(sorter.get(i) > best){
+                    bestInd = i;
+                    best = sorter.get(i);
+                }
+                else if(sorter.get(i) - bestInd == 0){
+                    if(i < bestInd){
                         bestInd = i;
                         best = sorter.get(i);
                     }
-                    else if(sorter.get(i) - bestInd == 0){
-                        if(i < bestInd){
-                            bestInd = i;
-                            best = sorter.get(i);
-                        }
-                    }
                 }
-                arr3[index] = bestInd;
-                index++;
-                sorter.remove(bestInd);
-                best = -1;
-                bestInd = 0;
             }
+            arr3[index] = bestInd;
+            index++;
+            sorter.remove(bestInd);
+            best = -1;
+            bestInd = 0;
+        }
 
-            return arr3[N-1];
+        return arr3[N-1];
     }
 
     /* ------- Task 3 ------- */
@@ -490,11 +507,11 @@ public class DWInteractionGraph {
     private List<Integer> getNeighbors(int node) {
         List<Integer> users = new ArrayList<>();
 
-            for (int j = 0; j < adjacencyMatrix.length; j++) {
-                if ( !adjacencyMatrix[node][j].isEmpty()) {
-                    users.add(j);
-                }
+        for (int j = 0; j < adjacencyMatrix.length; j++) {
+            if ( !adjacencyMatrix[node][j].isEmpty()) {
+                users.add(j);
             }
+        }
 
         return users;
     }
@@ -522,6 +539,27 @@ public class DWInteractionGraph {
      * if no path exists, should return null.
      */
     public List<Integer> BFS(int userID1, int userID2) {
+       /* Queue<List<Integer>> queue = new LinkedList<>();
+        List<Integer> path = new ArrayList<>();
+        Set<Integer> visited = new HashSet<>();
+        path.add(userID1);
+        queue.add(path);
+        while(!queue.isEmpty()){
+            path = queue.poll();
+            int prev = path.get(path.size()-1);
+            if(prev == userID2){
+                return path;
+            }
+            List<Integer> neighbours = getNeighbors(prev);
+            for(int i=0; i<neighbours.size(); i++){
+                if(!path.contains(neighbours.get(i))){
+                    List<Integer> newPath = new ArrayList<>(path);
+                    newPath.add(neighbours.get(i));
+                    queue.add(newPath);
+                }
+            }
+        }*/
+
         Set<Integer> visited = new HashSet<>(); //IMPROVE PERFORMANCE
         Queue<Integer> queue = new LinkedList<>();
         List<Integer> order = new ArrayList<>();
@@ -547,6 +585,8 @@ public class DWInteractionGraph {
             }
 
         }
+
+
 
         return null;
 
@@ -649,4 +689,5 @@ public class DWInteractionGraph {
 
         return infected.size();
     }
+
 }

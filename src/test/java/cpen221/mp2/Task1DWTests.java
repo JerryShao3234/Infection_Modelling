@@ -13,15 +13,14 @@ public class Task1DWTests {
     private static DWInteractionGraph dwig;
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
-    private static DWInteractionGraph dwig3;
 
     @BeforeAll
     public static void setupTests() {
         dwig = new DWInteractionGraph("resources/Task1-2Transactions.txt");
         dwig1 = new DWInteractionGraph(dwig, new int[]{3, 9});
         dwig2 = new DWInteractionGraph(dwig, Arrays.asList(2, 3, 4));
-        dwig3 = new DWInteractionGraph("empty.txt");
     }
+
     @Test
     public void test1GetUserIDsBase() {
         Set<Integer> expected = new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 8));
@@ -59,17 +58,6 @@ public class Task1DWTests {
         Assertions.assertEquals(2, dwig2.getEmailCount(2, 3));
     }
 
-
-    @Test
-    public void empty(){
-        Assertions.assertEquals(0, dwig3.getEmailCount(0, 0));
-    }
-
-    @Test
-    public void noUsers(){
-        Set<Integer> expected = new HashSet<>();
-        Assertions.assertEquals(expected, dwig3.getUserIDs());
-    }
     @Test
     public void custom() {
         DWInteractionGraph dwigC = new DWInteractionGraph("resources/Task1-2Transactions.txt", new int[]{2,3});
