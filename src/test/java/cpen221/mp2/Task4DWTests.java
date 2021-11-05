@@ -39,4 +39,11 @@ public class Task4DWTests {
         // in a 6-hour-long window after the attack starts.
         Assertions.assertEquals(5, dwig3.MaxBreachedUserCount(6));
     }
+
+    @Test
+    public void personal() {
+        // Attacking user 4 at t=3600 will lead to users 4, 5, 6, 3, and 1 (5 users) to be polluted
+        // in a 6-hour-long window after the attack starts.
+        Assertions.assertEquals(5, dwig3.ModifiedBFS(4, 21600, 0));
+    }
 }

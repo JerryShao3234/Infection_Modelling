@@ -13,7 +13,7 @@ public class DWInteractionGraph {
 
     private String fileName = new String();
     private StringBuilder interaction = new StringBuilder();
-    private List<Integer> adjacencyMatrix[][];
+    private List<Integer> adjacencyMatrix[][] = new ArrayList[1][1];
     private HashSet<String> vertexSet = new HashSet<>();
 
     /**
@@ -26,54 +26,69 @@ public class DWInteractionGraph {
     public DWInteractionGraph(String fileName) {
         this.fileName = fileName;
         File text = new File(fileName);
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
-                interaction.append(" ");
-                interaction.append(fileLine);
+
+        if(text.length()!=0) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(fileName));
+                for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                    interaction.append(" ");
+                    interaction.append(fileLine);
+                }
+                reader.close();
+            } catch (FileNotFoundException oof) {
+                System.out.println("Constructor failed!");
+            } catch (IOException ioe) {
+                System.out.println("IOE exception!");
             }
-            reader.close();
-        }
-        catch (FileNotFoundException oof){
-            System.out.println("Constructor failed!");
-        }
-        catch (IOException ioe){
-            System.out.println("IOE exception!");
-        }
 
-        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
-        for(int i=0; i<charArr.length; i++){
-            if((i+1)%3 != 0){
-                vertexSet.add(charArr[i]);
+            String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+            for (int i = 0; i < charArr.length; i++) {
+                if ((i + 1) % 3 != 0) {
+                    vertexSet.add(charArr[i]);
+                }
+            }
+
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
+
+            //adjacencyMatrix = new int[max+1][max+1];
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                for (int j = 0; j < adjacencyMatrix.length; j++) {
+                    //adjacencyMatrix[i][j] = -1;
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
+            }
+
+            for (int i = 0; i < charArr.length; i += 3) {
+                adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt(charArr[i + 2]));
             }
         }
+        else {
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
 
-        int max = 0;
-        for(String user : vertexSet){
-            if(Integer.parseInt(user) > max){
-                max = Integer.parseInt(user);
+            //adjacencyMatrix = new int[max+1][max+1];
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                for (int j = 0; j < adjacencyMatrix.length; j++) {
+                    //adjacencyMatrix[i][j] = -1;
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
             }
         }
-
-        //adjacencyMatrix = new int[max+1][max+1];
-        adjacencyMatrix = new ArrayList[max+1][max+1];
-
-
-        for(int i=0; i<adjacencyMatrix.length; i++){
-            for(int j=0; j<adjacencyMatrix.length; j++){
-                //adjacencyMatrix[i][j] = -1;
-                adjacencyMatrix[i][j] = new ArrayList<>();
-            }
-        }
-
-        for(int i=0; i<charArr.length; i+=3){
-            //adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])] = Integer.parseInt(charArr[i+2]);
-            adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])].add(Integer.parseInt(charArr[i+2]));
-        }
-
-
-
-
     }
 
     /**
@@ -88,58 +103,69 @@ public class DWInteractionGraph {
     public DWInteractionGraph(String fileName, int[] timeWindow) {
         this.fileName = fileName;
         File text = new File(fileName);
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
-                interaction.append(" ");
-                interaction.append(fileLine);
-            }
-            reader.close();
-        }
-        catch (FileNotFoundException oof){
-            System.out.println("Constructor failed!");
-        }
-        catch (IOException ioe){
-            System.out.println("IOE exception!");
-        }
-
-        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
-        for(int i=0; i<interaction.toString().trim().split(" ").length; i+=3){
-            if(Integer.parseInt((charArr[i+2])) <= timeWindow[1] && Integer.parseInt((charArr[i+2])) >= timeWindow[0]){
-                vertexSet.add(charArr[i]);
-                vertexSet.add(charArr[i+1]);
-            }
-        }
-
-        int max = 0;
-        for(String user : vertexSet){
-            if(Integer.parseInt(user) > max){
-                max = Integer.parseInt(user);
-            }
-        }
-
-        //adjacencyMatrix = new int[max+1][max+1];
-        adjacencyMatrix = new ArrayList[max+1][max+1];
-
-        for(int i=0; i<max+1; i++){
-            for(int j=0; j<max+1; j++){
-                adjacencyMatrix[i][j] = new ArrayList<>();
-            }
-        }
-        for(int i=0; i<charArr.length; i+=3){
-            if(Integer.parseInt(charArr[i+2]) <= timeWindow[1] && Integer.parseInt(charArr[i+2]) >= timeWindow[0]){
-                adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])].add(Integer.parseInt(charArr[i+2]));
-            }
-            /*else{
-                if(i < max+1 && i+1 < max+1) { //change
-                    adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt("-1"));
+        if(text.length() != 0) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(fileName));
+                for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                    interaction.append(" ");
+                    interaction.append(fileLine);
                 }
-                else{
-                    continue;
+                reader.close();
+            } catch (FileNotFoundException oof) {
+                System.out.println("Constructor failed!");
+            } catch (IOException ioe) {
+                System.out.println("IOE exception!");
+            }
+
+            String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+            for (int i = 0; i < interaction.toString().trim().split(" ").length; i += 3) {
+                if (Integer.parseInt((charArr[i + 2])) <= timeWindow[1] && Integer.parseInt((charArr[i + 2])) >= timeWindow[0]) {
+                    vertexSet.add(charArr[i]);
+                    vertexSet.add(charArr[i + 1]);
                 }
-            }*/
+            }
+
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
+
+            //adjacencyMatrix = new int[max+1][max+1];
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+            for (int i = 0; i < max + 1; i++) {
+                for (int j = 0; j < max + 1; j++) {
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
+            }
+            for (int i = 0; i < charArr.length; i += 3) {
+                if (Integer.parseInt(charArr[i + 2]) <= timeWindow[1] && Integer.parseInt(charArr[i + 2]) >= timeWindow[0]) {
+                    adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt(charArr[i + 2]));
+                }
+            }
+            System.out.println("hi");
         }
-        System.out.println("hi");
+        else {
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
+
+            //adjacencyMatrix = new int[max+1][max+1];
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                for (int j = 0; j < adjacencyMatrix.length; j++) {
+                    //adjacencyMatrix[i][j] = -1;
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
+            }
+        }
 
     }
 
@@ -158,13 +184,10 @@ public class DWInteractionGraph {
 
         fileName = inputDWIG.helperGetFileName();
         int tempSize = inputDWIG.helperGetAdjMatx().length;
-        //int[][] temp = new int[tempSize][tempSize];
+
         List<Integer> temp[][] = new ArrayList[tempSize][tempSize]; //modify
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
-                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
-                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //NEED TO MAKE A COPY
-
                 temp[i][j] = new ArrayList<>();
                 for(Integer time : inputDWIG.helperGetAdjMatx()[i][j]){
                     if(time >= timeFilter[0] && time <= timeFilter[1]){
@@ -177,11 +200,6 @@ public class DWInteractionGraph {
         this.adjacencyMatrix = temp; //risky move
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
-                /*if(temp[i][j] >= timeFilter[0] && temp[i][j] <= timeFilter[1]){
-                    vertexSet.add(String.valueOf(i));
-                    vertexSet.add(String.valueOf(j));
-                }*/
-
                 for(Integer inty : temp[i][j]){
                     if(inty >= timeFilter[0] && inty <= timeFilter[1]){ //guaranteed anyways
                         vertexSet.add(String.valueOf(i));
@@ -274,8 +292,6 @@ public class DWInteractionGraph {
     }
 
     Set<String> getVertexSet() {
-
-
         return vertexSet; //make a copy
     }
 
@@ -506,32 +522,6 @@ public class DWInteractionGraph {
      * if no path exists, should return null.
      */
     public List<Integer> BFS(int userID1, int userID2) {
-       /* Queue<List<Integer>> queue = new LinkedList<>();
-        List<Integer> path = new ArrayList<>();
-        Set<Integer> visited = new HashSet<>();
-        path.add(userID1);
-        queue.add(path);
-
-        while(!queue.isEmpty()){
-            path = queue.poll();
-            int prev = path.get(path.size()-1);
-
-            if(prev == userID2){
-                return path;
-            }
-
-            List<Integer> neighbours = getNeighbors(prev);
-
-            for(int i=0; i<neighbours.size(); i++){
-                if(!path.contains(neighbours.get(i))){
-                    List<Integer> newPath = new ArrayList<>(path);
-                    newPath.add(neighbours.get(i));
-                    queue.add(newPath);
-                }
-            }
-
-        }*/
-
         Set<Integer> visited = new HashSet<>(); //IMPROVE PERFORMANCE
         Queue<Integer> queue = new LinkedList<>();
         List<Integer> order = new ArrayList<>();
@@ -557,8 +547,6 @@ public class DWInteractionGraph {
             }
 
         }
-
-
 
         return null;
 
@@ -607,8 +595,58 @@ public class DWInteractionGraph {
      * @return the maximum number of users that can be polluted in N hours
      */
     public int MaxBreachedUserCount(int hours) {
-        // TODO: Implement this method
-        return 0;
+        int seconds = hours*3600;
+        int node = 0;
+        int maxInfected = 0;
+        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+        Set<String> interactionTime = new HashSet<>();
+
+        for(int i=0; i<charArr.length; i++){
+            if((i+1)%3 == 0){
+                interactionTime.add(charArr[i]);
+            }
+        }
+
+        for(String j : interactionTime) {
+            for (String i : getVertexSet()) {
+                node = Integer.parseInt(i);
+                maxInfected = ModifiedBFS(node, seconds, Integer.parseInt(j)) > maxInfected ? ModifiedBFS(node, seconds, Integer.parseInt(j)) : maxInfected;
+            }
+        }
+        return maxInfected;
     }
 
+    public int ModifiedBFS(int user1, int seconds, int index) {
+
+        Set<Integer> infected = new HashSet<>();
+        Set<Integer> maxInfected = new HashSet<>();
+        Set<Integer> visited = new HashSet<>();
+        Queue<Integer> queue = new LinkedList<>();
+
+        infected.add(user1);
+
+        for(int i=index; i<=seconds+index; i++){
+            visited = new HashSet<>();
+            queue = new LinkedList<>();
+            queue.add(user1);
+            visited.add(user1);
+            while(!queue.isEmpty()){
+                int node2 = queue.poll();
+                for(Integer neighbour : getNeighbors(node2)){
+
+                    if(infected.contains(node2) && adjacencyMatrix[node2][neighbour].contains(i)){
+                        infected.add(neighbour);
+                        System.out.println(neighbour);
+                    }
+
+                    if(!visited.contains(neighbour)){
+                        queue.add(neighbour);
+                        visited.add(neighbour);
+                    }
+                }
+            }
+        }
+
+        return infected.size();
+    }
 }

@@ -23,50 +23,66 @@ public class UDWInteractionGraph {
     public UDWInteractionGraph(String fileName) {
         this.fileName = fileName;
         File text = new File(fileName);
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
-                interaction.append(" ");
-                interaction.append(fileLine);
+        if(text.length() != 0) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(fileName));
+                for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                    interaction.append(" ");
+                    interaction.append(fileLine);
+                }
+                reader.close();
+            } catch (FileNotFoundException oof) {
+                System.out.println("Constructor failed!");
+            } catch (IOException ioe) {
+                System.out.println("IOE exception!");
             }
-            reader.close();
-        }
-        catch (FileNotFoundException oof){
-            System.out.println("Constructor failed!");
-        }
-        catch (IOException ioe){
-            System.out.println("IOE exception!");
-        }
 
-        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
-        for(int i=0; i<charArr.length; i++){
-            if((i+1)%3 != 0){
-                vertexSet.add(charArr[i]);
+            String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+            for (int i = 0; i < charArr.length; i++) {
+                if ((i + 1) % 3 != 0) {
+                    vertexSet.add(charArr[i]);
+                }
+            }
+
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
+
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                for (int j = 0; j < adjacencyMatrix.length; j++) {
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
+            }
+
+            for (int i = 0; i < charArr.length; i += 3) {
+                adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt(charArr[i + 2]));
             }
         }
+        else {
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
 
-        int max = 0;
-        for(String user : vertexSet){
-            if(Integer.parseInt(user) > max){
-                max = Integer.parseInt(user);
+            //adjacencyMatrix = new int[max+1][max+1];
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                for (int j = 0; j < adjacencyMatrix.length; j++) {
+                    //adjacencyMatrix[i][j] = -1;
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
             }
         }
-
-        adjacencyMatrix = new ArrayList[max+1][max+1];
-
-
-        for(int i=0; i<adjacencyMatrix.length; i++){
-            for(int j=0; j<adjacencyMatrix.length; j++){
-                adjacencyMatrix[i][j] = new ArrayList<>();
-            }
-        }
-
-        for(int i=0; i<charArr.length; i+=3){
-            adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i+1])].add(Integer.parseInt(charArr[i+2]));
-        }
-
-
-        System.out.println("hi");
     }
 
     /**
@@ -172,7 +188,6 @@ public class UDWInteractionGraph {
             }
         }
         adjacencyMatrix = temp;
-        System.out.println("lmao");
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
                 if(!temp[i][j].isEmpty()){
