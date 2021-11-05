@@ -433,6 +433,10 @@ public class UDWInteractionGraph {
      * @return whether a path exists between the two users
      */
     public boolean PathExists(int userID1, int userID2) {
+
+        if(userID1 == userID2) {
+            return true;
+        }
         Set<Integer> visited = new HashSet<>(); //IMPROVE PERFORMANCE
         Queue<Integer> queue = new LinkedList<>();
         List<Integer> order = new ArrayList<>();
