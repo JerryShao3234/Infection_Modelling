@@ -14,19 +14,22 @@ public class UDWInteractionGraph {
     /* Building the Constructors */
 
     /**
-     * Creates a new UDWInteractionGraph using an email interaction file.
+     * Creates a new DWInteractionGraph using an email interaction file.
      * The email interaction file will be in the resources directory.
      *
-     * @param fileName the name of the file in the resources
-     *                 directory containing email interactions
+     * @param fileName   the name of the file in the resources
+     *                   directory containing email interactions
+     * @param timeWindow the 2 element array that specifies the timeWindow of
+     *                   email interactions supposed to be recorded
      */
-    public UDWInteractionGraph(String fileName) {
+    public UDWInteractionGraph(String fileName, int[] timeWindow) {
         this.fileName = fileName;
         File text = new File(fileName);
-        if(text.length() != 0) {
+        if (text.length() != 0) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(fileName));
-                for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                for (String fileLine = reader.readLine(); fileLine != null;
+                     fileLine = reader.readLine()) {
                     interaction.append(" ");
                     interaction.append(fileLine);
                 }
@@ -37,7 +40,82 @@ public class UDWInteractionGraph {
                 System.out.println("IOE exception!");
             }
 
-            String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+            String[] charArr =
+                interaction.toString().trim().split(" ");
+            for (int i = 0; i < interaction.toString().trim().split(" ").length; i += 3) {
+                if (Integer.parseInt((charArr[i + 2])) <= timeWindow[1] &&
+                    Integer.parseInt((charArr[i + 2])) >= timeWindow[0]) {
+                    vertexSet.add(charArr[i]);
+                    vertexSet.add(charArr[i + 1]);
+                }
+            }
+
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
+
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+            for (int i = 0; i < max + 1; i++) {
+                for (int j = 0; j < max + 1; j++) {
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
+            }
+            for (int i = 0; i < charArr.length; i += 3) {
+                if (Integer.parseInt(charArr[i + 2]) <= timeWindow[1] &&
+                    Integer.parseInt(charArr[i + 2]) >= timeWindow[0]) {
+                    adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(
+                        charArr[i + 1])].add(Integer.parseInt(charArr[i + 2]));
+                }
+            }
+        } else {
+            int max = 0;
+            for (String user : vertexSet) {
+                if (Integer.parseInt(user) > max) {
+                    max = Integer.parseInt(user);
+                }
+            }
+
+            adjacencyMatrix = new ArrayList[max + 1][max + 1];
+
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                for (int j = 0; j < adjacencyMatrix.length; j++) {
+                    adjacencyMatrix[i][j] = new ArrayList<>();
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a new UDWInteractionGraph using an email interaction file.
+     * The email interaction file will be in the resources directory.
+     *
+     * @param fileName the name of the file in the resources
+     *                 directory containing email interactions
+     */
+    public UDWInteractionGraph(String fileName) {
+        this.fileName = fileName;
+        File text = new File(fileName);
+        if (text.length() != 0) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(fileName));
+                for (String fileLine = reader.readLine(); fileLine != null;
+                     fileLine = reader.readLine()) {
+                    interaction.append(" ");
+                    interaction.append(fileLine);
+                }
+                reader.close();
+            } catch (FileNotFoundException oof) {
+                System.out.println("Constructor failed!");
+            } catch (IOException ioe) {
+                System.out.println("IOE exception!");
+            }
+
+            String[] charArr =
+                interaction.toString().trim().split(" "); //for debugging purposes only
             for (int i = 0; i < charArr.length; i++) {
                 if ((i + 1) % 3 != 0) {
                     vertexSet.add(charArr[i]);
@@ -61,10 +139,10 @@ public class UDWInteractionGraph {
             }
 
             for (int i = 0; i < charArr.length; i += 3) {
-                adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(Integer.parseInt(charArr[i + 2]));
+                adjacencyMatrix[Integer.parseInt(charArr[i])][Integer.parseInt(charArr[i + 1])].add(
+                    Integer.parseInt(charArr[i + 2]));
             }
-        }
-        else {
+        } else {
             int max = 0;
             for (String user : vertexSet) {
                 if (Integer.parseInt(user) > max) {
@@ -72,9 +150,7 @@ public class UDWInteractionGraph {
                 }
             }
 
-            //adjacencyMatrix = new int[max+1][max+1];
             adjacencyMatrix = new ArrayList[max + 1][max + 1];
-
 
             for (int i = 0; i < adjacencyMatrix.length; i++) {
                 for (int j = 0; j < adjacencyMatrix.length; j++) {
@@ -100,16 +176,12 @@ public class UDWInteractionGraph {
 
         fileName = inputUDWIG.helperGetFileName();
         int tempSize = inputUDWIG.helperGetAdjMatx().length;
-        //int[][] temp = new int[tempSize][tempSize];
         List<Integer> temp[][] = new ArrayList[tempSize][tempSize]; //modify
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
-                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //lmao does this actually work??
-                //temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j]; //NEED TO MAKE A COPY
-
                 temp[i][j] = new ArrayList<>();
-                for(Integer time : inputUDWIG.helperGetAdjMatx()[i][j]){
-                    if(time >= timeFilter[0] && time <= timeFilter[1]){
+                for (Integer time : inputUDWIG.helperGetAdjMatx()[i][j]) {
+                    if (time >= timeFilter[0] && time <= timeFilter[1]) {
                         temp[i][j].add(time);
                     }
                 }
@@ -119,13 +191,8 @@ public class UDWInteractionGraph {
         this.adjacencyMatrix = temp; //risky move
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
-                /*if(temp[i][j] >= timeFilter[0] && temp[i][j] <= timeFilter[1]){
-                    vertexSet.add(String.valueOf(i));
-                    vertexSet.add(String.valueOf(j));
-                }*/
-
-                for(Integer inty : temp[i][j]){
-                    if(inty >= timeFilter[0] && inty <= timeFilter[1]){ //guaranteed anyways
+                for (Integer inty : temp[i][j]) {
+                    if (inty >= timeFilter[0] && inty <= timeFilter[1]) { //guaranteed anyways
                         vertexSet.add(String.valueOf(i));
                         vertexSet.add(String.valueOf(j));
                     }
@@ -147,14 +214,12 @@ public class UDWInteractionGraph {
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, List<Integer> userFilter) {
         fileName = inputUDWIG.helperGetFileName();
         int tempSize = inputUDWIG.helperGetAdjMatx().length;
-        //int[][] temp = new int[tempSize][tempSize];
         List<Integer> temp[][] = new ArrayList[tempSize][tempSize];
-        for(int i=0; i<tempSize; i++){
-            for(int j=0; j<tempSize; j++){
-                if(userFilter.contains(i) || userFilter.contains(j)) {
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
+                if (userFilter.contains(i) || userFilter.contains(j)) {
                     temp[i][j] = inputUDWIG.helperGetAdjMatx()[i][j];
-                }
-                else{
+                } else {
                     temp[i][j] = new ArrayList();
                 }
             }
@@ -163,7 +228,7 @@ public class UDWInteractionGraph {
         System.out.println("lmao");
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
-                if(!temp[i][j].isEmpty()){
+                if (!temp[i][j].isEmpty()) {
                     vertexSet.add(String.valueOf(i));
                     vertexSet.add(String.valueOf(j));
                 }
@@ -181,8 +246,8 @@ public class UDWInteractionGraph {
         int tempSize = inputDWIG.helperGetAdjMatx().length;
         //int[][] temp = new int[tempSize][tempSize];
         List<Integer> temp[][] = new ArrayList[tempSize][tempSize];
-        for(int i=0; i<tempSize; i++){
-            for(int j=0; j<tempSize; j++){
+        for (int i = 0; i < tempSize; i++) {
+            for (int j = 0; j < tempSize; j++) {
                 temp[i][j] = new ArrayList<>();
                 temp[i][j] = inputDWIG.helperGetAdjMatx()[i][j];
             }
@@ -190,7 +255,7 @@ public class UDWInteractionGraph {
         adjacencyMatrix = temp;
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
-                if(!temp[i][j].isEmpty()){
+                if (!temp[i][j].isEmpty()) {
                     vertexSet.add(String.valueOf(i));
                     vertexSet.add(String.valueOf(j));
                 }
@@ -204,7 +269,7 @@ public class UDWInteractionGraph {
      */
     public Set<Integer> getUserIDs() {
         Set<Integer> UserIDs = new HashSet<>();
-        for(String id : vertexSet){
+        for (String id : vertexSet) {
             Integer num = (Integer.parseInt(id));
             UserIDs.add(num);
             num = null;
@@ -218,7 +283,8 @@ public class UDWInteractionGraph {
      * @return the number of email interactions (send/receive) between user1 and user2
      */
     public int getEmailCount(int user1, int user2) {
-        return user1==user2 ? adjacencyMatrix[user1][user2].size() : adjacencyMatrix[user1][user2].size()+adjacencyMatrix[user2][user1].size();
+        return user1 == user2 ? adjacencyMatrix[user1][user2].size() :
+            adjacencyMatrix[user1][user2].size() + adjacencyMatrix[user2][user1].size();
     }
 
     /*
@@ -228,16 +294,15 @@ public class UDWInteractionGraph {
         return fileName;
     }
 
-    /*int[][] helperGetAdjMatx() {*/
-    List<Integer>[][] helperGetAdjMatx(){
+    List<Integer>[][] helperGetAdjMatx() {
         List<Integer> temp[][] = new ArrayList[adjacencyMatrix.length][adjacencyMatrix.length];
-        for(int i=0; i<adjacencyMatrix.length; i++){
-            for(int j=0; j<adjacencyMatrix.length; j++){
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int j = 0; j < adjacencyMatrix.length; j++) {
                 temp[i][j] = new ArrayList();
                 temp[i][j].addAll(adjacencyMatrix[i][j]);
             }
         }
-        return adjacencyMatrix; //copy????
+        return adjacencyMatrix;
     }
 
     Set<String> getVertexSet() {
@@ -250,12 +315,10 @@ public class UDWInteractionGraph {
      * @param timeWindow is an int array of size 2 [t0, t1]
      *                   where t0<=t1
      * @return an int array of length 2, with the following structure:
-     *  [NumberOfUsers, NumberOfEmailTransactions]
+     * [NumberOfUsers, NumberOfEmailTransactions]
      */
     public int[] ReportActivityInTimeWindow(int[] timeWindow) {
-        // TODO: Implement this method
-
-        UDWInteractionGraph time = new UDWInteractionGraph(this,timeWindow );
+        UDWInteractionGraph time = new UDWInteractionGraph(this, timeWindow);
         int[] activity = new int[2];
 
         Set<Integer> user = time.getUserIDs();
@@ -263,15 +326,10 @@ public class UDWInteractionGraph {
         activity[0] = user.size();
         activity[1] = 0;
 
-        for(int i = 0; i<user.size(); i++)
-        {
-            for(int j = i+1; j< user.size(); j++)
-            {
-                activity[1]+= time.getEmailCount(i,userList.get(j));
-
+        for (int i = 0; i < user.size(); i++) {
+            for (int j = i + 1; j < user.size(); j++) {
+                activity[1] += time.getEmailCount(i, userList.get(j));
             }
-
-
         }
 
         return activity;
@@ -281,45 +339,33 @@ public class UDWInteractionGraph {
      * @param userID the User ID of the user for which
      *               the report will be created
      * @return an int array of length 2 with the following structure:
-     *  [NumberOfEmails, UniqueUsersInteractedWith]
+     * [NumberOfEmails, UniqueUsersInteractedWith]
      * If the specified User ID does not exist in this instance of a graph,
      * returns [0, 0].
      */
     public int[] ReportOnUser(int userID) {
-        // TODO: Implement this method
-
         Set<Integer> userSet = this.getUserIDs();
         List<Integer> userList = userSet.stream().toList();
-        int[] report = new int[]{0,0};
+        int[] report = new int[] {0, 0};
         boolean check = true;
         int k = 0;
 
-        for(int j: userList)
-        {
-            if(userID == j)
-            {
+        for (int j : userList) {
+            if (userID == j) {
                 k = j;
                 check = false;
             }
-
         }
 
-        if(check)
-        {
+        if (check) {
             return report;
-
         }
 
-        for(int i = 0; i < userList.size(); i++)
-        {
-            report[0]  += this.getEmailCount(k,userList.get(i));
-
-            if(this.getEmailCount(k,i) > 0)
-            {
+        for (int i = 0; i < userList.size(); i++) {
+            report[0] += this.getEmailCount(k, userList.get(i));
+            if (this.getEmailCount(k, i) > 0) {
                 report[1]++;
             }
-
-
         }
 
         return report;
@@ -330,55 +376,56 @@ public class UDWInteractionGraph {
      * @return the User ID for the Nth most active user
      */
     public int NthMostActiveUser(int N) {
-        int arr[] = new int[adjacencyMatrix.length];
-        int arr3[] = new int[adjacencyMatrix.length];
-        int sum = 0; //dont forget to reset it!
-        for(int i=0; i<adjacencyMatrix.length; i++){
-            for(int j=0; j< adjacencyMatrix[0].length; j++){
-                 sum += adjacencyMatrix[i][j].size();
-                 sum += adjacencyMatrix[j][i].size();
+        int helperArr[] = new int[adjacencyMatrix.length];
+        int sortedUsers[] = new int[adjacencyMatrix.length];
+        int sum = 0;
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int j = 0; j < adjacencyMatrix[0].length; j++) {
+                sum += adjacencyMatrix[i][j].size();
+                sum += adjacencyMatrix[j][i].size();
             }
-            arr[i] = sum;
+            helperArr[i] = sum;
             sum = 0;
         }
 
         HashMap<Integer, Integer> sorter = new HashMap<>();
-        for(int i=0; i<arr.length; i++){
-            sorter.put(i,arr[i]);
+        for (int i = 0; i < helperArr.length; i++) {
+            sorter.put(i, helperArr[i]);
         }
 
         int test = 0;
-        for(Integer i : sorter.keySet()){
-            if(sorter.get(i)>0){test++;}
+        for (Integer i : sorter.keySet()) {
+            if (sorter.get(i) > 0) {
+                test++;
+            }
         }
-        if(N>test){
+        if (N > test) {
             return -1;
         }
 
         int best = -1;
         int bestInd = 0;
         int index = 0;
-        while(!sorter.isEmpty()){
-            for(Integer i : sorter.keySet()){
-                if(sorter.get(i) > best){
+        while (!sorter.isEmpty()) {
+            for (Integer i : sorter.keySet()) {
+                if (sorter.get(i) > best) {
                     bestInd = i;
                     best = sorter.get(i);
-                }
-                else if(sorter.get(i) - bestInd == 0){
-                    if(i < bestInd){
+                } else if (sorter.get(i) - bestInd == 0) {
+                    if (i < bestInd) {
                         bestInd = i;
                         best = sorter.get(i);
                     }
                 }
             }
-            arr3[index] = bestInd;
+            sortedUsers[index] = bestInd;
             index++;
             sorter.remove(bestInd);
             best = -1;
             bestInd = 0;
         }
 
-        return arr3[N-1];
+        return sortedUsers[N - 1];
     }
 
     /* ------- Task 3 ------- */
@@ -387,41 +434,42 @@ public class UDWInteractionGraph {
         Set<Integer> users = new HashSet<>();
 
         for (int j = 0; j < adjacencyMatrix.length; j++) {
-            if ( !adjacencyMatrix[node][j].isEmpty()) {
+            if (!adjacencyMatrix[node][j].isEmpty()) {
                 users.add(j);
             }
         }
         for (int j = 0; j < adjacencyMatrix.length; j++) {
-            if ( !adjacencyMatrix[j][node].isEmpty()) {
+            if (!adjacencyMatrix[j][node].isEmpty()) {
                 users.add(j);
             }
         }
-
-
         return users;
     }
 
     /**
      * @return the number of completely disjoint graph
-     *    components in the UDWInteractionGraph object.
+     * components in the UDWInteractionGraph object.
      */
     public int NumberOfComponents() {
-        int count =0 ;
+        int count = 0;
         Set<Integer> visited = new HashSet<>();
-        for(String node : getVertexSet()){
+        for (String node : getVertexSet()) {
             int node2 = Integer.parseInt(node);
-            if(!visited.contains(node2)){
+            if (!visited.contains(node2)) {
                 DFSRecur(node2, visited);
-                count ++;
+                count++;
             }
         }
         return count;
     }
 
-    void DFSRecur(int v, Set<Integer> visited){ //this works
+    /**
+     * Helper method that does DFS recursively
+     */
+    private void DFSRecur(int v, Set<Integer> visited) {
         visited.add(v);
-        for(Integer i : getNeighbors(v)){
-            if(!visited.contains(i)){
+        for (Integer i : getNeighbors(v)) {
+            if (!visited.contains(i)) {
                 DFSRecur(i, visited);
             }
         }
@@ -433,28 +481,27 @@ public class UDWInteractionGraph {
      * @return whether a path exists between the two users
      */
     public boolean PathExists(int userID1, int userID2) {
-
-        if(userID1 == userID2) {
+        if (userID1 == userID2) {
             return true;
         }
-        Set<Integer> visited = new HashSet<>(); //IMPROVE PERFORMANCE
+        Set<Integer> visited = new HashSet<>();
         Queue<Integer> queue = new LinkedList<>();
         List<Integer> order = new ArrayList<>();
 
         visited.add(userID1);
         queue.add(userID1);
         order.add(userID1);
-        while(!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             Integer node = queue.poll();
             Set<Integer> neighbours = getNeighbors(node);
 
-            for(Integer n : neighbours){ //preserves ascending order
-                if(n == userID2){
+            for (Integer n : neighbours) {
+                if (n == userID2) {
                     order.add(userID2);
                     return true;
                 }
 
-                if(!visited.contains(n)){
+                if (!visited.contains(n)) {
                     visited.add(n);
                     queue.add(n);
                     order.add(n);
@@ -462,11 +509,6 @@ public class UDWInteractionGraph {
             }
 
         }
-
-
-
         return false;
-
     }
-
 }

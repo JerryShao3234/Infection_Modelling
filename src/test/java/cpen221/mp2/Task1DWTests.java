@@ -17,7 +17,7 @@ public class Task1DWTests {
     @BeforeAll
     public static void setupTests() {
         dwig = new DWInteractionGraph("resources/Task1-2Transactions.txt");
-        dwig1 = new DWInteractionGraph(dwig, new int[]{3, 9});
+        dwig1 = new DWInteractionGraph(dwig, new int[] {3, 9});
         dwig2 = new DWInteractionGraph(dwig, Arrays.asList(2, 3, 4));
     }
 
@@ -60,7 +60,8 @@ public class Task1DWTests {
 
     @Test
     public void custom() {
-        DWInteractionGraph dwigC = new DWInteractionGraph("resources/Task1-2Transactions.txt", new int[]{2,3});
+        DWInteractionGraph dwigC =
+            new DWInteractionGraph("resources/Task1-2Transactions.txt", new int[] {2, 3});
         Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3)), dwigC.getUserIDs());
     }
 
