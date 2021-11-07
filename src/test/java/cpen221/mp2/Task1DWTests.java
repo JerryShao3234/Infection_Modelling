@@ -13,12 +13,16 @@ public class Task1DWTests {
     private static DWInteractionGraph dwig;
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
+    private static DWInteractionGraph dwig3;
+    private static DWInteractionGraph dwig4;
 
     @BeforeAll
     public static void setupTests() {
         dwig = new DWInteractionGraph("resources/Task1-2Transactions.txt");
-        dwig1 = new DWInteractionGraph(dwig, new int[] {3, 9});
+        dwig1 = new DWInteractionGraph(dwig, new int[]{3, 9});
         dwig2 = new DWInteractionGraph(dwig, Arrays.asList(2, 3, 4));
+        dwig3 = new DWInteractionGraph("resources/empty.txt");
+        dwig4 = new DWInteractionGraph("resources/myTransactions.txt");
     }
 
     @Test
@@ -61,8 +65,31 @@ public class Task1DWTests {
     @Test
     public void custom() {
         DWInteractionGraph dwigC =
-            new DWInteractionGraph("resources/Task1-2Transactions.txt", new int[] {2, 3});
+            new DWInteractionGraph("resources/Task1-2Transactions.txt", new int[]{2, 3});
         Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3)), dwigC.getUserIDs());
+    }
+
+    @Test
+    public void empty() {
+        Assertions.assertEquals(0, dwig3.getEmailCount(0, 0));
+    }
+
+    @Test
+    public void noUsers() {
+        Set<Integer> expected = new HashSet<>();
+        Assertions.assertEquals(expected, dwig3.getUserIDs());
+    }
+
+    @Test
+    public void myTransactionsGetUserIDsBase() {
+        Set<Integer> expected = new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7));
+        Assertions.assertEquals(expected, dwig4.getUserIDs());
+    }
+
+    @Test
+    public void myTransactionsGetEmailCountBase() {
+        Assertions.assertEquals(1, dwig4.getEmailCount(6, 1));
+        Assertions.assertEquals(0, dwig4.getEmailCount(6, 7));
     }
 
 }

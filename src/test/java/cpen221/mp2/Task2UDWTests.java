@@ -10,10 +10,12 @@ import java.util.List;
 public class Task2UDWTests {
 
     private static UDWInteractionGraph testGraphBase;
+    private static UDWInteractionGraph testGraph2;
 
     @BeforeAll
     public static void setupTests() {
         testGraphBase = new UDWInteractionGraph("resources/Task1-2UDWTransactions.txt");
+        testGraph2 = new UDWInteractionGraph("resources/Task1-2UDWTransactions.txt", new int[]{1,3});
     }
 
     @Test
