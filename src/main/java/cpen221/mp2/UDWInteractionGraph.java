@@ -277,24 +277,37 @@ public class UDWInteractionGraph {
         return UserIDs;
     }
 
+    /* helper */
+
     /**
      * @param user1 the User ID of the first user.
      * @param user2 the User ID of the second user.
      * @return the number of email interactions (send/receive) between user1 and user2
      */
     public int getEmailCount(int user1, int user2) {
+        if (!vertexSet.contains(String.valueOf(user1)) ||
+            !vertexSet.contains(String.valueOf(user2))) {
+            return 0;
+        }
         return user1 == user2 ? adjacencyMatrix[user1][user2].size() :
             adjacencyMatrix[user1][user2].size() + adjacencyMatrix[user2][user1].size();
     }
 
-    /*
-     *Helper method
+    /**
+     * Helper Method:
+     *
+     * @return the fileName in String format
      */
-    String helperGetFileName() {
+    private String helperGetFileName() {
         return fileName;
     }
 
-    List<Integer>[][] helperGetAdjMatx() {
+    /**
+     * Helper Method:
+     *
+     * @return a copy of the adjacencyMatrix
+     */
+    private List<Integer>[][] helperGetAdjMatx() {
         List<Integer> temp[][] = new ArrayList[adjacencyMatrix.length][adjacencyMatrix.length];
         for (int i = 0; i < adjacencyMatrix.length; i++) {
             for (int j = 0; j < adjacencyMatrix.length; j++) {
@@ -305,6 +318,12 @@ public class UDWInteractionGraph {
         return adjacencyMatrix;
     }
 
+
+    /**
+     * Helper Method:
+     *
+     * @return the vertexSet
+     */
     Set<String> getVertexSet() {
         return vertexSet; //make a copy
     }
@@ -344,6 +363,9 @@ public class UDWInteractionGraph {
      * returns [0, 0].
      */
     public int[] ReportOnUser(int userID) {
+        if (!vertexSet.contains(String.valueOf(userID))) {
+            return new int[] {0, 0};
+        }
         Set<Integer> userSet = this.getUserIDs();
         List<Integer> userList = userSet.stream().toList();
         int[] report = new int[] {0, 0};
@@ -430,6 +452,12 @@ public class UDWInteractionGraph {
 
     /* ------- Task 3 ------- */
 
+    /**
+     * Helper Method:
+     *
+     * @param node an int representing a node
+     * @return a set of the neighbours of node
+     */
     private Set<Integer> getNeighbors(int node) {
         Set<Integer> users = new HashSet<>();
 
@@ -465,6 +493,9 @@ public class UDWInteractionGraph {
 
     /**
      * Helper method that does DFS recursively
+     *
+     * @param v       a starting node for DFS
+     * @param visited a set of visited nodes
      */
     private void DFSRecur(int v, Set<Integer> visited) {
         visited.add(v);
@@ -483,6 +514,10 @@ public class UDWInteractionGraph {
     public boolean PathExists(int userID1, int userID2) {
         if (userID1 == userID2) {
             return true;
+        }
+        if (!vertexSet.contains(String.valueOf(userID1)) ||
+            !getVertexSet().contains(String.valueOf(userID2))) {
+            return false;
         }
         Set<Integer> visited = new HashSet<>();
         Queue<Integer> queue = new LinkedList<>();
