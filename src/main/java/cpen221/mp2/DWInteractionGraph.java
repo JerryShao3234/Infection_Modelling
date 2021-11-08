@@ -1,8 +1,6 @@
 package cpen221.mp2;
 
 import java.io.*;
-import java.sql.Array;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -610,11 +608,14 @@ public class DWInteractionGraph {
      * @return the maximum number of users that can be polluted in N hours
      */
     public int MaxBreachedUserCount(int hours) {
+
         int seconds = hours * 3600;
         int node = 0;
         int maxInfected = 0;
-        String[] charArr = interaction.toString().trim().split(" "); //for debugging purposes only
+        String[] charArr = interaction.toString().trim().split(" ");
         Set<String> interactionTime = new HashSet<>();
+
+        interactionTime.add("0");
 
         for (int i = 0; i < charArr.length; i++) {
             if ((i + 1) % 3 == 0) {
@@ -622,56 +623,55 @@ public class DWInteractionGraph {
             }
         }
 
-        for (String j : interactionTime) {
+        for (String str : interactionTime) {
             for (String i : getVertexSet()) {
                 node = Integer.parseInt(i);
-                maxInfected = ModifiedBFS(node, seconds, Integer.parseInt(j)) > maxInfected ?
-                    ModifiedBFS(node, seconds, Integer.parseInt(j)) : maxInfected;
+                maxInfected =
+                    Math.max(ModifiedBFS(node, seconds, interactionTime, Integer.parseInt(str)),
+                        maxInfected);
             }
         }
+
         return maxInfected;
     }
 
     /**
      * Helper Method:
      *
-     * @param user1   a node to be polluted
-     * @param seconds the seconds the virus has before firewall starts
+     * @param user1           a node to be polluted
+     * @param seconds         the seconds the virus has before firewall starts
+     * @param interactionTime a set of edge times
+     * @param offset          the starting time offset
      * @return the maximum number of users that can be polluted in N hours
-     * @pararm index  the start time in seconds
      */
-    private int ModifiedBFS(int user1, int seconds, int index) {
+    private int ModifiedBFS(int user1, int seconds, Set<String> interactionTime, int offset) {
 
-        Set<Integer> infected = new HashSet<>();
-        Set<Integer> maxInfected = new HashSet<>();
-        Set<Integer> visited = new HashSet<>();
-        Queue<Integer> queue = new LinkedList<>();
+        Boolean[] infected = new Boolean[adjacencyMatrix.length];
+        for (int i = 0; i < infected.length; i++) {
+            infected[i] = false;
+        }
 
-        infected.add(user1);
-
-        for (int i = index; i <= seconds + index; i++) {
-            visited = new HashSet<>();
-            queue = new LinkedList<>();
-            queue.add(user1);
-            visited.add(user1);
-            while (!queue.isEmpty()) {
-                int node2 = queue.poll();
-                for (Integer neighbour : getNeighbors(node2)) {
-
-                    if (infected.contains(node2) && adjacencyMatrix[node2][neighbour].contains(i)) {
-                        infected.add(neighbour);
-                        System.out.println(neighbour);
-                    }
-
-                    if (!visited.contains(neighbour)) {
-                        queue.add(neighbour);
-                        visited.add(neighbour);
+        infected[user1] = true;
+        for (int time = offset; time < offset + seconds; time++) {
+            if (interactionTime.contains(String.valueOf(time))) {
+                for (int x = 0; x < adjacencyMatrix.length; x++) {
+                    if (infected[x]) {
+                        for (int y = 0; y < adjacencyMatrix.length; y++) {
+                            if (adjacencyMatrix[x][y].contains((time))) {
+                                infected[y] = true;
+                            }
+                        }
                     }
                 }
             }
         }
-
-        return infected.size();
+        int infectCount = 0;
+        for (int i = 0; i < infected.length; i++) {
+            if (infected[i]) {
+                infectCount++;
+            }
+        }
+        return infectCount;
     }
 
 }

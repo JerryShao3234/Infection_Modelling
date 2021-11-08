@@ -12,12 +12,14 @@ public class Task4DWTests {
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
     private static DWInteractionGraph dwig3;
+    private static DWInteractionGraph dwig4;
 
     @BeforeAll
     public static void setupTests() {
         dwig1 = new DWInteractionGraph("resources/Task4Transactions1.txt");
         dwig2 = new DWInteractionGraph("resources/Task4Transactions2.txt");
         dwig3 = new DWInteractionGraph("resources/Task4Transactions3.txt");
+        dwig4 = new DWInteractionGraph("resources/email-Eu-core-temporal-Dept1.txt");
     }
 
     @Test
@@ -39,5 +41,6 @@ public class Task4DWTests {
         // in a 6-hour-long window after the attack starts.
         Assertions.assertEquals(5, dwig3.MaxBreachedUserCount(6));
     }
+
 
 }
