@@ -225,7 +225,6 @@ public class DWInteractionGraph {
             }
         }
         adjacencyMatrix = temp;
-        System.out.println("lmao");
         for (int i = 0; i < tempSize; i++) {
             for (int j = 0; j < tempSize; j++) {
                 if (!temp[i][j].isEmpty()) {
